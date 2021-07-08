@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "380400494877",
+    "project_id": "tech-dwom",
+    "storage_bucket": "tech-dwom.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:380400494877:android:67797da2cfdd0ebacfd9f4",
+        "android_client_info": {
+          "package_name": "com.techdwom"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "380400494877-nq7pkfl233k734k7jfbo1p7ikl7v2fl9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCD_kmCWAX52_s-lZwXzHYrfwDRl2QJG1c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "380400494877-nq7pkfl233k734k7jfbo1p7ikl7v2fl9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
