@@ -26,11 +26,12 @@ import {
 import { BlurView } from "expo-blur";
 import AppLoading from "expo-app-loading";
 import Sheet from "react-modal-sheet";
-
 export default function Main({ navigation }) {
   const [intensity, setIntensity] = useState(60);
   const [blurType, setBlurType] = useState("light");
   const [isOpen, setOpen] = useState(false);
+  const [isOpenCart, setOpenCart] = useState(false);
+  const [itemValue, setItemValue] = useState(0);
   const toggleOverlay = () => {
     setVisible(!visible);
   };
@@ -56,7 +57,10 @@ export default function Main({ navigation }) {
   if (blurType === "xlight") {
     tintColor.reverse();
   }
-
+  const handleCheckout = () => {
+    setOpenCart(!isOpenCart)
+    navigation.navigate("Checkout")
+  };
   const renderCategorySelectedItem = ({ item }) => {
     return (
       <TouchableOpacity
@@ -85,10 +89,6 @@ export default function Main({ navigation }) {
       </TouchableOpacity>
     );
   };
-  const blur = () => {
-    setIntensity(60);
-    console.log(intensity);
-  };
 
   if (!fontsLoaded) {
     return <AppLoading />;
@@ -105,16 +105,18 @@ export default function Main({ navigation }) {
                 source={require("../assets/images/profile.jpg")}
                 style={styles.profileImage}
               />
-              <View>
-                <AntDesign
-                  name="shoppingcart"
-                  size={32}
-                  color="black"
-                  style={styles.menuIcon}
-                >
-                  <Text style={styles.ribbonText}>2</Text>
-                </AntDesign>
-              </View>
+              <TouchableOpacity onPress={() => setOpenCart(!isOpenCart)}>
+                <View>
+                  <AntDesign
+                    name="shoppingcart"
+                    size={32}
+                    color="black"
+                    style={styles.menuIcon}
+                  >
+                    <Text style={styles.ribbonText}>2</Text>
+                  </AntDesign>
+                </View>
+              </TouchableOpacity>
             </View>
           </SafeAreaView>
 
@@ -171,7 +173,6 @@ export default function Main({ navigation }) {
           snapPoints={[600, 400, 100, 0]}
           initialSnap={1}
           isOpen={isOpen}
-          isOpen={isOpen}
           onClose={() => setOpen(false)}
         >
           <Sheet.Container>
@@ -199,6 +200,71 @@ export default function Main({ navigation }) {
                   horizontal
                   showsHorizontalScrollIndicator={false}
                 />
+              </View>
+            </Sheet.Content>
+          </Sheet.Container>
+
+          <Sheet.Backdrop />
+        </Sheet>
+
+        <Sheet
+          snapPoints={[600, 400, 100, 0]}
+          initialSnap={1}
+          isOpen={isOpenCart}
+          onClose={() => setOpenCart(false)}
+        >
+          <Sheet.Container>
+            <Sheet.Header />
+            <Sheet.Content>
+              <View style={{ paddingHorizontal: 20, paddingVertical: 20 }}>
+                <ScrollView>
+                  {[1, 2, 3].map((ele, i) => {
+                    return (
+                      <View style={styles.purItem}>
+                        <View style={styles.purItemImageView}>
+                          <Image
+                            source={require("../assets/images/shoe1.jpg")}
+                            style={styles.purItemImage}
+                          />
+                        </View>
+                        <View style={styles.purItemDescView}>
+                          <Text style={styles.titleText}>Shoe 1</Text>
+                          <Text style={styles.priceText}>&cent;20</Text>
+                        </View>
+                        <View style={styles.btnWrapper}>
+                          <TouchableOpacity
+                            style={styles.itemBtn}
+                            onPress={() => setItemValue(itemValue + 1)}
+                          >
+                            <Feather
+                              name="chevron-up"
+                              size={24}
+                              color="black"
+                            />
+                          </TouchableOpacity>
+                          {itemValue}
+                          <TouchableOpacity
+                            style={styles.itemBtn}
+                            onPress={() => setItemValue(itemValue - 1)}
+                          >
+                            <Feather
+                              name="chevron-down"
+                              size={24}
+                              color="black"
+                            />
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    );
+                  })}
+                  <View style={styles.details}>
+                    <Text style={styles.totals}>Total:</Text>
+                    <Text style={styles.totals}>&cent; 200</Text>
+                  </View>
+                  <TouchableOpacity onPress={handleCheckout} style={styles.buttonWrapper}>
+                    <Text style={styles.buttonText}>Buy Now</Text>
+                  </TouchableOpacity>
+                </ScrollView>
               </View>
             </Sheet.Content>
           </Sheet.Container>
@@ -242,7 +308,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    width: "100%"
+    width: "100%",
   },
   categorySelectedItem: {
     fontFamily: "regular",
@@ -400,5 +466,82 @@ const styles = StyleSheet.create({
     shadowRadius: 4.65,
 
     elevation: 7,
+  },
+  purItem: {
+    display: "flex",
+    flexDirection: "row",
+    marginTop: 10,
+  },
+  purItemImageView: {
+    flex: 2,
+  },
+  purItemImage: {
+    width: "90%",
+    height: 140,
+    borderRadius: 10,
+  },
+  purItemDescView: {
+    flex: 3,
+    display: "flex",
+    flexDirection: "column",
+    paddingHorizontal: 10,
+  },
+  btnWrapper: {
+    flex: 1,
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  itemBtn: {
+    borderRadius: 50,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  titleText: {
+    fontFamily: "bold",
+    fontSize: 21,
+    color: "black",
+  },
+  priceText: {
+    color: "gray",
+    fontSize: 18,
+    fontFamily: "bold",
+    marginBottom: 10,
+  },
+  hrLine: {
+    width: "100%",
+    borderBottomColor: "#c7c7c7",
+    borderWidth: 1,
+    marginVertical: 20,
+  },
+  buttonWrapper: {
+    marginHorizontal: 20,
+    marginTop: 40,
+    marginBottom: 20,
+    backgroundColor: "#0C2431",
+    alignItems: "center",
+    paddingVertical: 15,
+    borderRadius: 50,
+  },
+  buttonText: {
+    fontFamily: "regular",
+    fontSize: 18,
+    color: "white",
+  },
+  details: {
+    display: "flex",
+    flexDirection: "row",
+    paddingTop: 20,
+    justifyContent: "space-between",
+  },
+  totals: {
+    fontWeight: "bold",
+    fontSize: 18,
   },
 });

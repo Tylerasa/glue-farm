@@ -61,6 +61,7 @@ export default function SignUp({ navigation }) {
         const uid = response.user.uid;
         const data = {
           id: uid,
+          accType: "customer",
           email,
           fullName,
         };
@@ -93,11 +94,6 @@ export default function SignUp({ navigation }) {
             {/* <WavyBody customStyles={styles.svgCurve} /> */}
 
             <View style={styles.inputView}>
-              <KeyboardAvoidingView
-                behavior={Platform.OS == "ios" ? "padding" : "height"}
-                style={{ flex: 1 }}
-              >
-                <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                   <View>
                   <View style={styles.textWrapper}>
                     <SimpleLineIcons name="user" size={20} color="#c7c7c7" />
@@ -188,9 +184,7 @@ export default function SignUp({ navigation }) {
 
 
                   </View>
-                </TouchableWithoutFeedback>
-              </KeyboardAvoidingView>
-
+     
                   <View style={styles.buttons}>
                     <TouchableOpacity onPress={onRegisterPress}>
                       <View style={styles.btn}>

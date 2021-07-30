@@ -1,6 +1,7 @@
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
+import "firebase/storage";
 var firebaseConfig = {
   apiKey: "AIzaSyCMLgNzr5h6RL6jcB29IoE9FJ0iDRj2sbo",
   authDomain: "tekdwom.firebaseapp.com",
@@ -13,4 +14,5 @@ var firebaseConfig = {
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
-export { firebase };
+
+export {firebase};

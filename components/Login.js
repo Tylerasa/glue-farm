@@ -50,7 +50,13 @@ export default function Login({ navigation }) {
               return;
             }
             const user = firestoreDocument.data();
-            navigation.navigate("Main", { user });
+            console.log(user)
+            if(user.accType === "customer"){
+              navigation.navigate("Main", { user });
+            }else{
+              navigation.navigate("SupplierMain", { user });
+
+            }
           })
           .catch((error) => {
             alert(error);

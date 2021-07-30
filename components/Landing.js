@@ -9,7 +9,10 @@ import {
 // import * as Font from "expo-font";
 import { useFonts } from "expo-font";
 import AppLoading from "expo-app-loading";
+
+
 export default function Landing({ navigation }) {
+ 
   // useEffect(() => {
   //   async function loadFont() {
   //     await Font.loadAsync({

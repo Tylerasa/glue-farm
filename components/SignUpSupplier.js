@@ -38,6 +38,7 @@ export default function SignUpSupplier({navigation}) {
         const uid = response.user.uid;
         const data = {
           id: uid,
+          accType: "supplier",
           email,
           fullName,
         };
@@ -46,7 +47,7 @@ export default function SignUpSupplier({navigation}) {
           .doc(uid)
           .set(data)
           .then(() => {
-            navigation.navigate("Main", { user: data });
+            navigation.navigate("SupplierMain", { user: data });
           })
           .catch((error) => {
             alert(error);
@@ -71,11 +72,7 @@ export default function SignUpSupplier({navigation}) {
           {/* <WavyBody customStyles={styles.svgCurve} /> */}
 
           <View style={styles.inputView}>
-            <KeyboardAvoidingView
-              behavior={Platform.OS == "ios" ? "padding" : "height"}
-              style={{ flex: 1 }}
-            >
-              <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+ 
                 <View>
                   <View style={styles.textWrapper}>
                     <SimpleLineIcons name="user" size={20} color="#c7c7c7" />
@@ -165,9 +162,7 @@ export default function SignUpSupplier({navigation}) {
                     </TouchableOpacity>
                   </View>
                 </View>
-              </TouchableWithoutFeedback>
-            </KeyboardAvoidingView>
-
+       
             <View style={styles.buttons}>
               <TouchableOpacity onPress={onRegisterPress}>
                 <View style={styles.btn}>

@@ -11,6 +11,10 @@ import Product from "./components/Product";
 import { firebase } from "./src/firebase/config"
 import SignUpWrapper from "./components/SignUpWrapper";
 import SignUpSupplier from "./components/SignUpSupplier";
+import Checkout from "./components/Checkout";
+import SupplierMain from "./components/SupplierMain";
+import AddImage from "./components/AddImage";
+import CheckSales from "./components/CheckSales";
 export default function App() {
 
   const [loading, setLoading] = useState()
@@ -53,7 +57,11 @@ export default function App() {
         <Stack.Screen name="SignUp" component={SignUp} />
         <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="Main" component={Main} />
+        <Stack.Screen name="SupplierMain" component={SupplierMain} />
         <Stack.Screen name="Product" component={Product} />
+        <Stack.Screen name="Checkout" component={Checkout} />
+        <Stack.Screen name="AddImage" component={AddImage} />
+        <Stack.Screen name="CheckSales" component={CheckSales} />
       </Stack.Navigator>
     </NavigationContainer>
   );
