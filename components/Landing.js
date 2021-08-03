@@ -9,10 +9,36 @@ import {
 // import * as Font from "expo-font";
 import { useFonts } from "expo-font";
 import AppLoading from "expo-app-loading";
-
+import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 
 export default function Landing({ navigation }) {
- 
+  useEffect(() => {
+    fetch(
+      `https://sandbox.momodeveloper.mtn.com/collection/v1_0/requesttopay/${uuidv4()}`,
+      // {
+      //   headers: {
+      //     "Access-Control-Allow-Origin": "http://localhost:19006",
+      //     "Access-Control-Allow-Credentials": "true",
+      //     "Access-Control-Allow-Headers": "Content-Type, Authorization"
+      //   },
+      // }
+      { mode: 'no-cors' }
+    )
+      .then((response) => console.log(response))
+
+      .catch((error) => {
+        console.error(error);
+      });
+
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then((response) => response.json())
+      .then((responseJson) => {
+        console.log("getting data from fetch", responseJson);
+      })
+      .catch((error) => console.log(error));
+  },);
+
   // useEffect(() => {
   //   async function loadFont() {
   //     await Font.loadAsync({
@@ -82,7 +108,7 @@ const styles = StyleSheet.create({
   imageStyle: {
     width: "100%",
     height: "100%",
-   
+
     resizeMode: "cover",
     justifyContent: "center",
     alignItems: "center",

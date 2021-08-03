@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Platform,
   Button,
+  Alert,
 } from "react-native";
 import {
   Fontisto,
@@ -19,6 +20,7 @@ import Modal from "react-native-modal";
 import { firebase } from "../src/firebase/config";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import "firebase/storage";
+import { useEffect } from "react/cjs/react.production.min";
 
 export default function AddImage({ route, navigation }) {
   const MAX_POINTS = 500;
@@ -45,56 +47,67 @@ export default function AddImage({ route, navigation }) {
     contentType: "image/jpeg",
   };
   async function handleSubmit() {
-    setModalVisible(true);
-    const response = await fetch(route.params.image);
-    const blob = await response.blob();
-    const uploadTask = storage
-      .ref()
-      .child(`images/${pdtName}`)
-      .put(blob, metadata);
-      
+    if (price > 0 && pdtDesc.length > 10 && itemValue > 0 && pdtName.length > 4) {
+      setModalVisible(true);
+      const response = await fetch(route.params.image);
+      const blob = await response.blob();
+      const uploadTask = storage
+        .ref()
+        .child(`images/${pdtName}`)
+        .put(blob, metadata);
 
-    uploadTask
-    .on(
-      "state_changed",
-      (snapshot) => {
-        const progress = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-        );
-        setProgress(progress);
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-    uploadTask
-      .then((res) => {
-        console.log("Image uploaded to the bucket!");
-        console.log(res);
-        console.log(uploadTask);
-        console.log(storage)
-        setModalVisible(!modalVisible);
-        const pdtInfo = db.collection("supplier products").add({
-          name: pdtName,
-          description: pdtDesc,
-          numberInStock: itemValue,
-          price,
-          image: `gs://${uploadTask._ref.bucket}/images/${pdtName}`,
-          path: `images/${pdtName}`
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = Math.round(
+            (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          );
+          setProgress(progress);
+          console.log(typeof progress);
+          if (progress == 100) {
+            navigation.navigate("SupplierMain");
+          }
+        },
+        (error) => {
+          console.log(error);
+        }
+      );
+      uploadTask
+        .then((res) => {
+          console.log("Image uploaded to the bucket!");
+          console.log(res);
+          console.log(uploadTask);
+          console.log(storage);
+          setModalVisible(!modalVisible);
+          const pdtInfo = db.collection("supplier products").add({
+            name: pdtName,
+            description: pdtDesc,
+            numberInStock: itemValue,
+            price,
+            image: `gs://${uploadTask._ref.bucket}/images/${pdtName}`,
+            path: `images/${pdtName}`,
+            id: route.params.user.id,
+          });
+          console.log(pdtInfo);
+        })
+        .catch((e) => {
+          console.log("uploading image error => ", e);
+          setModalVisible(!modalVisible);
         });
-        console.log(pdtInfo);
-      })
-      .catch((e) => {
-        console.log("uploading image error => ", e);
-        setModalVisible(!modalVisible);
-      });
+    } else {
+      Alert.alert(
+        "Check Input Fields... Product must not be less than 4, Product Description must not be less 10, Price and Stock Number can't be 0"
+      );
+      console.log("Error")
+  
+    }
   }
 
   return (
     <View style={styles.container}>
       {route.params.image && (
         <Image
-          source={{ uri: route.params.image }}
+          source={{ uri: route.params.image || route.params.image }}
           style={{ width: "100%", height: 350 }}
         />
       )}
@@ -127,7 +140,7 @@ export default function AddImage({ route, navigation }) {
           style={{
             display: "flex",
             flexDirection: "row",
-            marginTop: 20,
+            marginVertical: 20,
             alignItems: "center",
           }}
         >
@@ -148,9 +161,21 @@ export default function AddImage({ route, navigation }) {
             </TouchableOpacity>
           </View>
         </View>
-        <View>
-          <Text>Stock: </Text>
-          
+        <View style={{ display: "flex", flexDirection: "row" }}>
+          <Text>Price: </Text>
+          <TextInput
+            placeholder="$0"
+            placeholderTextColor="#c7c7c7"
+            onChangeText={(text) => setPrice(text)}
+            keyboardType="numeric"
+            style={[
+              styles.textInputPrice,
+              {
+                color: "black",
+              },
+            ]}
+            autoCapitalize="none"
+          />
         </View>
       </View>
       <View style={{ width: "100%" }}>
@@ -158,19 +183,48 @@ export default function AddImage({ route, navigation }) {
           <Text style={styles.buttonText}>Submit</Text>
         </TouchableOpacity>
       </View>
-      <Modal isVisible={modalVisible}>
-        <View style={styles.centeredView}>
+
+      <View
+        style={{
+          width: "100%",
+          height: "100%",
+          position: "absolute",
+          zIndex: 100,
+          // display: "flex",
+          display: modalVisible ? "flex" : "none",
+          backgroundColor: "#00000080",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: "white",
+            width: 300,
+            height: 300,
+            borderRadius: 18,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            padding: 30,
+          }}
+        >
           <AnimatedCircularProgress
             size={200}
             width={3}
             fill={progress}
-            tintColor="#00e0ff"
+            tintColor="red"
             backgroundColor="#3d5875"
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
             {(progress) => <Text style={styles.points}>{progress}</Text>}
           </AnimatedCircularProgress>
         </View>
-      </Modal>
+      </View>
     </View>
   );
 }
@@ -214,6 +268,31 @@ const styles = StyleSheet.create({
     height: 40,
     paddingLeft: 20,
     width: "100%",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.29,
+    shadowRadius: 4.65,
+
+    elevation: 7,
+  },
+  textInputPrice: {
+    marginTop: 10,
+    // flex: 1,
+    marginLeft: 30,
+    marginTop: Platform.OS === "ios" ? 0 : -12,
+    paddingLeft: 20,
+    paddingVertical: 20,
+    marginBottom: 20,
+    color: "#000",
+    fontFamily: "regular",
+    // height: 40,
+    borderRadius: 18,
+    height: 40,
+    paddingLeft: 20,
+    width: "20%",
     shadowColor: "#000",
     shadowOffset: {
       width: 0,

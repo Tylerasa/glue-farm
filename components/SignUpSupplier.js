@@ -94,6 +94,7 @@ export default function SignUpSupplier({navigation}) {
                     <TextInput
                       placeholder="Email"
                       placeholderTextColor="#c7c7c7"
+                      keyboardType="email-address"
                       onChangeText={(text) => setEmail(text)}
                       value={email}
                       style={[

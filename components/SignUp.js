@@ -131,6 +131,7 @@ export default function SignUp({ navigation }) {
                       placeholderTextColor="#c7c7c7"
                       onChangeText={(text) => setEmail(text)}
                       value={email}
+                      keyboardType="email-address"
                       style={[
                         styles.textInput,
                         {

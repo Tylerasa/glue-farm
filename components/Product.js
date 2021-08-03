@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   ScrollView,
   Image,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
 import {
   Fontisto,
@@ -19,13 +19,15 @@ import {
 } from "@expo/vector-icons";
 // import * as Font from "expo-font";
 import { useFonts } from "expo-font";
-import AppLoading from 'expo-app-loading';
+import AppLoading from "expo-app-loading";
 const height = Dimensions.get("window").height;
 
 const Product = ({ route, navigation }) => {
+  var list
   const { item } = route.params;
   const [like, setLike] = useState(false);
-
+  const [selectedItems, setSelectedItems] = useState(route.params.selectedItems || [])
+  console.log(item);
   // useEffect(() => {
   //   async function loadFont() {
   //     await Font.loadAsync({
@@ -46,13 +48,21 @@ const Product = ({ route, navigation }) => {
   const handleLike = () => {
     setLike(!like);
   };
+  const handleCart = ()=>{
+    list.push(item)
+    setSelectedItems([...selectedItems, item])
+    navigation.navigate("Main", {selectedItems})
+  }
   if (!fontsLoaded) {
     return <AppLoading />;
   } else {
     return (
       <ScrollView>
         <View style={styles.container}>
-          <ImageBackground source={item.image} style={styles.backgroundImage}>
+          <ImageBackground
+            source={{ uri: item.url }}
+            style={styles.backgroundImage}
+          >
             <SafeAreaView>
               <View style={styles.menuWrapper}>
                 <TouchableOpacity
@@ -69,7 +79,7 @@ const Product = ({ route, navigation }) => {
                       color="black"
                       style={styles.menuIcon}
                     >
-                      <Text style={styles.ribbonText}>2</Text>
+                      <Text style={styles.ribbonText}>{list.length}</Text>
                     </AntDesign>
                   </TouchableOpacity>
                 </View>
@@ -77,7 +87,7 @@ const Product = ({ route, navigation }) => {
             </SafeAreaView>
           </ImageBackground>
           <View style={styles.descriptionWrapper}>
-            <TouchableOpacity onPress={handleLike}>
+            {/* <TouchableOpacity onPress={handleLike}>
               <View style={styles.heartWrapper}>
                 {like ? (
                   <Entypo name="heart" size={32} color="#0C2431" />
@@ -85,24 +95,24 @@ const Product = ({ route, navigation }) => {
                   <Entypo name="heart-outlined" size={32} color="#0C2431" />
                 )}
               </View>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
             <View style={styles.titleTextWrapper}>
               <Text style={styles.titleText}>{item.title}</Text>
             </View>
 
             <View style={styles.infoWrapper}>
-              <Text style={styles.priceText}>${item.price}</Text>
+              <Text style={styles.priceText}>${item.item.price}</Text>
               <Text style={styles.pdtInfo}>Product Information</Text>
               <ScrollView style={styles.pdfScrollView}>
                 <Text style={styles.productDescriptionText}>
-                  {item.productDescription}
+                  {item.item.description}
                 </Text>
               </ScrollView>
             </View>
 
             <TouchableOpacity
               style={styles.buttonWrapper}
-              onPress={() => alert("Added To Cart!")}
+              onPress={handleCart}
             >
               <Text style={styles.buttonText}>Add To Cart</Text>
             </TouchableOpacity>

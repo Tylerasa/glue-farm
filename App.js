@@ -2,7 +2,7 @@ import { StatusBar } from "expo-status-bar";
 import React,{useEffect, useState} from "react";
 import { StyleSheet, Text, View } from "react-native";
 import Landing from "./components/Landing";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, DefaultTheme } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import SignUp from "./components/SignUp";
 import Login from "./components/Login";
@@ -15,6 +15,14 @@ import Checkout from "./components/Checkout";
 import SupplierMain from "./components/SupplierMain";
 import AddImage from "./components/AddImage";
 import CheckSales from "./components/CheckSales";
+import SupplierProduct from "./components/SupplierProduct";
+const MyTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: 'white'
+  },
+};
 export default function App() {
 
   const [loading, setLoading] = useState()
@@ -44,8 +52,10 @@ export default function App() {
     });
   }, []);
   const Stack = createStackNavigator();
+  
+  
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={MyTheme}>
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
@@ -62,6 +72,7 @@ export default function App() {
         <Stack.Screen name="Checkout" component={Checkout} />
         <Stack.Screen name="AddImage" component={AddImage} />
         <Stack.Screen name="CheckSales" component={CheckSales} />
+        <Stack.Screen name="SupplierProduct" component={SupplierProduct} />
       </Stack.Navigator>
     </NavigationContainer>
   );

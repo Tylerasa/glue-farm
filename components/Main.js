@@ -14,7 +14,8 @@ import {
 } from "react-native";
 // import * as Font from "expo-font";
 import { useFonts } from "expo-font";
-
+import { firebase } from "../src/firebase/config";
+import "firebase/storage";
 import categories from "../assets/categories";
 import shoes from "../assets/shoes";
 import {
@@ -26,16 +27,31 @@ import {
 import { BlurView } from "expo-blur";
 import AppLoading from "expo-app-loading";
 import Sheet from "react-modal-sheet";
-export default function Main({ navigation }) {
+import SkeletonContent from "react-native-skeleton-content";
+export default function Main({ navigation, route }) {
+  // const {item} = route.params
+  console.log(route.params.selectedItems)
   const [intensity, setIntensity] = useState(60);
   const [blurType, setBlurType] = useState("light");
   const [isOpen, setOpen] = useState(false);
   const [isOpenCart, setOpenCart] = useState(false);
   const [itemValue, setItemValue] = useState(0);
+  const db = firebase.firestore();
+  const [products, setProducts] = useState([]);
+  const storage = firebase.storage().ref();
+  const [dataFetched, setDataFetched] = useState(false);
+  const [selectedItems, setSelectedItem]= useState(route.params.selectedItems|| [])
+  var updateTemp = [];
+
   const toggleOverlay = () => {
     setVisible(!visible);
   };
 
+  // useEffect(()=>{
+  //   console.log("here")
+  //   setSelectedItem([...selectedItems, item])
+  //   console.log(selectedItems)
+  // }, [route])
   // useEffect(() => {
   //   async function loadFont() {
   //     await Font.loadAsync({
@@ -46,6 +62,45 @@ export default function Main({ navigation }) {
   //   }
   //   loadFont();
   // }, []);
+  useEffect(() => {
+    db.collection("supplier products")
+      .get()
+      .then((snapshot) => {
+        const tempDoc = [];
+        console.log(snapshot);
+        var len = snapshot.docs.length;
+        console.log(len);
+        snapshot.docs.forEach((doc) => {
+          let item = doc.data();
+          console.log(item);
+          storage
+            .child(item.path)
+            .getDownloadURL()
+            .then((url) => {
+              var temp = { item, url };
+              updateTemp.push(temp);
+              console.log(updateTemp.length);
+              // updateTemp = [...updateTemp, temp];
+
+              // console.log(updateTemp);
+              // console.log({ item, url });
+              // tempDoc.concat({ item, url })
+            });
+          console.log(updateTemp);
+        });
+        if (updateTemp.length >= len) {
+          console.log("twenty");
+          console.log(updateTemp);
+        } else {
+          console.log("ff");
+
+          console.log(updateTemp);
+        }
+      });
+    setProducts(updateTemp);
+
+    // setProducts(temp)
+  }, []);
 
   let [fontsLoaded] = useFonts({
     regular: require("../assets/fonts/Chivo-Regular.ttf"),
@@ -58,15 +113,28 @@ export default function Main({ navigation }) {
     tintColor.reverse();
   }
   const handleCheckout = () => {
-    setOpenCart(!isOpenCart)
-    navigation.navigate("Checkout")
+    setOpenCart(!isOpenCart);
+    navigation.navigate("Checkout");
   };
+  const secondLayout = [
+    {
+      width: 240,
+      height: 100,
+      marginBottom: 10,
+    },
+    {
+      width: 180,
+      height: 40,
+    },
+  ];
   const renderCategorySelectedItem = ({ item }) => {
+    // console.log(item);
     return (
       <TouchableOpacity
         onPress={() =>
           navigation.navigate("Product", {
             item: item,
+            selectedItems: route.params.selectedItems
           })
         }
       >
@@ -76,19 +144,23 @@ export default function Main({ navigation }) {
             { marginLeft: item.id === "1" ? 20 : 0 },
           ]}
         >
-          <Image source={item.image} style={styles.categorySelectedImage} />
+          <Image source={item.url} style={styles.categorySelectedImage} />
           <View style={styles.subText}>
             <View>
-              <Text style={styles.categorySelectedItem}>{item.title}</Text>
+              <Text style={styles.categorySelectedItem}>{item.item.name}</Text>
             </View>
             <View>
-              <Text style={styles.categorySelectedItem}>${item.price}</Text>
+              <Text style={styles.categorySelectedItem}>${item.item.price}</Text>
             </View>
           </View>
         </View>
       </TouchableOpacity>
     );
   };
+  setTimeout(() => {
+    // console.log(products);
+    setDataFetched(true);
+  }, 5000);
 
   if (!fontsLoaded) {
     return <AppLoading />;
@@ -113,7 +185,7 @@ export default function Main({ navigation }) {
                     color="black"
                     style={styles.menuIcon}
                   >
-                    <Text style={styles.ribbonText}>2</Text>
+                    <Text style={styles.ribbonText}>{selectedItems.length}</Text>
                   </AntDesign>
                 </View>
               </TouchableOpacity>
@@ -128,7 +200,7 @@ export default function Main({ navigation }) {
               <View style={styles.discoverCategoriesWrapper}>
                 {categories.map((ele, i) => {
                   return (
-                    <View style={styles.discoverCategoryTextWrapper}>
+                    <View key={i} style={styles.discoverCategoryTextWrapper}>
                       <Text style={styles.discoverCategoryText}>
                         {ele.text}
                       </Text>
@@ -140,26 +212,34 @@ export default function Main({ navigation }) {
           </View>
 
           <View style={styles.categorySelectedWrapper}>
-            <FlatList
-              data={shoes}
-              renderItem={renderCategorySelectedItem}
-              keyExtractor={(item) => item.id}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-            />
+            {dataFetched ? (
+              <FlatList
+                data={products}
+                renderItem={renderCategorySelectedItem}
+                keyExtractor={(item) => item.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+              />
+            ) : ( 
+             ""
+            )}
           </View>
 
           <View style={styles.recomWrapper}>
             <View style={styles.recomTitleTextWapper}>
               <Text style={styles.recomTitleText}>Recommended For You</Text>
             </View>
-            <FlatList
-              data={shoes}
-              renderItem={renderCategorySelectedItem}
-              keyExtractor={(item) => item.id}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-            />
+            {dataFetched ? (
+              <FlatList
+                data={products}
+                renderItem={renderCategorySelectedItem}
+                keyExtractor={(item) => item.id}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+              />
+            ) : (
+              ""
+            )}
           </View>
         </ScrollView>
         <TouchableOpacity onPress={() => setOpen(true)}>
@@ -193,13 +273,17 @@ export default function Main({ navigation }) {
                     autoCapitalize="none"
                   />
                 </View>
-                <FlatList
-                  data={shoes}
-                  renderItem={renderCategorySelectedItem}
-                  keyExtractor={(item) => item.id}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                />
+                {dataFetched ? (
+                  <FlatList
+                    data={products}
+                    renderItem={renderCategorySelectedItem}
+                    keyExtractor={(item) => item.id}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                  />
+                ) : (
+                  ""
+                )}
               </View>
             </Sheet.Content>
           </Sheet.Container>
@@ -220,7 +304,7 @@ export default function Main({ navigation }) {
                 <ScrollView>
                   {[1, 2, 3].map((ele, i) => {
                     return (
-                      <View style={styles.purItem}>
+                      <View key={i} style={styles.purItem}>
                         <View style={styles.purItemImageView}>
                           <Image
                             source={require("../assets/images/shoe1.jpg")}
@@ -261,7 +345,10 @@ export default function Main({ navigation }) {
                     <Text style={styles.totals}>Total:</Text>
                     <Text style={styles.totals}>&cent; 200</Text>
                   </View>
-                  <TouchableOpacity onPress={handleCheckout} style={styles.buttonWrapper}>
+                  <TouchableOpacity
+                    onPress={handleCheckout}
+                    style={styles.buttonWrapper}
+                  >
                     <Text style={styles.buttonText}>Buy Now</Text>
                   </TouchableOpacity>
                 </ScrollView>
@@ -280,6 +367,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
+    paddingLeft: 20
   },
   discoverWrapper: {
     // marginHorizontal: 20,
@@ -306,7 +394,7 @@ const styles = StyleSheet.create({
   subText: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     alignItems: "center",
     width: "100%",
   },
