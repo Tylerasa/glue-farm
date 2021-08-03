@@ -23,7 +23,7 @@ import AppLoading from "expo-app-loading";
 const height = Dimensions.get("window").height;
 
 const Product = ({ route, navigation }) => {
-  var list
+  var list =[]
   const { item } = route.params;
   const [like, setLike] = useState(false);
   const [selectedItems, setSelectedItems] = useState(route.params.selectedItems || [])
