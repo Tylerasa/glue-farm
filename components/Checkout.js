@@ -1,66 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, Picker, TouchableOpacity } from "react-native";
 import { AntDesign, Entypo } from "@expo/vector-icons";
 // import axios from "Axios";
 import { v4 as uuidv4 } from "uuid";
-export default function Checkout() {
+import { MaterialIcons } from '@expo/vector-icons';
+export default function Checkout({navigation}) {
   const abortController = new AbortController();
   const [selectedValue, setSelectedValue] = useState("mtn");
-  const handlePayment = () => {
-    // axios
-    //   .get(
-    //     `https://sandbox.momodeveloper.mtn.com/collection/v1_0/requesttopay/${uuidv4()}`,
-    //     {
-    //       headers: {"Access-Control-Allow-Origin": "*"},
-    //     },
-    //     {
-    //       signal: abortController.signal,
-    //     }
-    //   )
-    //   .then((res) => {
-    //     console.log(res);
-    //   });
-  };
+  useEffect(()=>{
+    setTimeout(()=>{
+      navigation.navigate("Main")
+    }, 2500)
+  })
   return (
     <View style={styles.container}>
-      <View style={styles.menuWrapper}>
-        <TouchableOpacity
-          style={styles.backIcon}
-          onPress={() => navigation.goBack()}
-        >
-          <Entypo name="chevron-left" size={32} color="black" />
-        </TouchableOpacity>
-        <View>
-          <TouchableOpacity>
-            <AntDesign
-              name="shoppingcart"
-              size={32}
-              color="black"
-              style={styles.menuIcon}
-            >
-              <Text style={styles.ribbonText}>2</Text>
-            </AntDesign>
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View style={styles.main}>
-        <Picker
-          selectedValue={selectedValue}
-          style={{ height: 50, width: "100%", marginBottom: 100 }}
-          onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
-        >
-          <Picker.Item label="MTN" value="mtn" />
-        </Picker>
-        <View style={styles.details}>
-          <Text style={styles.totals}>Total:</Text>
-          <Text style={styles.totals}>&cent; 200</Text>
-        </View>
-      </View>
-      <View style={{ position: "absolute", bottom: 10, width: 100 }}>
-        <TouchableOpacity onPress={handlePayment} style={styles.buttonWrapper}>
-          <Text style={styles.buttonText}>Pay Now</Text>
-        </TouchableOpacity>
-      </View>
+      <MaterialIcons name="error" size={50} color="black" />
+      <Text style={{fontSize: 24, textAlign: "center"}}>Thank You for Business</Text>
+      <Text style={{fontSize: 24, textAlign: "center"}}>Currently, the account is sandbox account so you can't make live transactions...</Text>
     </View>
   );
 }
@@ -71,6 +27,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     // paddingTop: 20,
     paddingHorizontal: 20,
+    alignItems: "center",
+    justifyContent: "center"
   },
   menuWrapper: {
     marginHorizontal: 20,

@@ -27,6 +27,7 @@ const Product = ({ route, navigation }) => {
   const { item } = route.params;
   const [like, setLike] = useState(false);
   const [selectedItems, setSelectedItems] = useState(route.params.selectedItems || [])
+  const [pdt, setPdt] = useState(item)
   console.log(item);
   // useEffect(() => {
   //   async function loadFont() {
@@ -49,9 +50,11 @@ const Product = ({ route, navigation }) => {
     setLike(!like);
   };
   const handleCart = ()=>{
-    list.push(item)
-    setSelectedItems([...selectedItems, item])
-    navigation.navigate("Main", {selectedItems})
+    console.log(pdt)
+    list.push(pdt)
+    console.log(list)
+    setSelectedItems( list)
+    navigation.navigate("Main", {selectedItems: list})
   }
   if (!fontsLoaded) {
     return <AppLoading />;

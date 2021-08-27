@@ -30,7 +30,7 @@ import Sheet from "react-modal-sheet";
 import SkeletonContent from "react-native-skeleton-content";
 export default function Main({ navigation, route }) {
   // const {item} = route.params
-  console.log(route.params.selectedItems)
+  console.log(route.params.selectedItems);
   const [intensity, setIntensity] = useState(60);
   const [blurType, setBlurType] = useState("light");
   const [isOpen, setOpen] = useState(false);
@@ -40,13 +40,24 @@ export default function Main({ navigation, route }) {
   const [products, setProducts] = useState([]);
   const storage = firebase.storage().ref();
   const [dataFetched, setDataFetched] = useState(false);
-  const [selectedItems, setSelectedItem]= useState(route.params.selectedItems|| [])
+  const [selectedItems, setSelectedItem] = useState(
+    route.params.selectedItems || []
+  );
+const [finList, setFinList] = useState([])
+  const [store, setStore] = useState( []);
   var updateTemp = [];
 
   const toggleOverlay = () => {
     setVisible(!visible);
   };
 
+  useEffect(() => {
+    setStore([...store, route.params.selectedItems]);
+    console.log("sp",store.splice(1))
+    setFinList(store.splice(1))
+    console.log(finList)
+    console.log("store==> ", store);
+  }, [route.params.selectedItems]);
   // useEffect(()=>{
   //   console.log("here")
   //   setSelectedItem([...selectedItems, item])
@@ -115,6 +126,7 @@ export default function Main({ navigation, route }) {
   const handleCheckout = () => {
     setOpenCart(!isOpenCart);
     navigation.navigate("Checkout");
+    isOpen(false)
   };
   const secondLayout = [
     {
@@ -134,7 +146,7 @@ export default function Main({ navigation, route }) {
         onPress={() =>
           navigation.navigate("Product", {
             item: item,
-            selectedItems: route.params.selectedItems
+            selectedItems: route.params.selectedItems,
           })
         }
       >
@@ -150,7 +162,9 @@ export default function Main({ navigation, route }) {
               <Text style={styles.categorySelectedItem}>{item.item.name}</Text>
             </View>
             <View>
-              <Text style={styles.categorySelectedItem}>${item.item.price}</Text>
+              <Text style={styles.categorySelectedItem}>
+                ${item.item.price}
+              </Text>
             </View>
           </View>
         </View>
@@ -185,7 +199,7 @@ export default function Main({ navigation, route }) {
                     color="black"
                     style={styles.menuIcon}
                   >
-                    <Text style={styles.ribbonText}>{selectedItems.length}</Text>
+                    <Text style={styles.ribbonText}>{store.length - 1}</Text>
                   </AntDesign>
                 </View>
               </TouchableOpacity>
@@ -220,8 +234,8 @@ export default function Main({ navigation, route }) {
                 horizontal
                 showsHorizontalScrollIndicator={false}
               />
-            ) : ( 
-             ""
+            ) : (
+              ""
             )}
           </View>
 
@@ -242,13 +256,13 @@ export default function Main({ navigation, route }) {
             )}
           </View>
         </ScrollView>
-        <TouchableOpacity onPress={() => setOpen(true)}>
+        {/* <TouchableOpacity onPress={() => setOpen(true)}>
           <View style={styles.searchContainer}>
             <View style={styles.searchButton}>
               <Feather name="search" size={26} color="#fff" />
             </View>
           </View>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <Sheet
           snapPoints={[600, 400, 100, 0]}
           initialSnap={1}
@@ -302,54 +316,56 @@ export default function Main({ navigation, route }) {
             <Sheet.Content>
               <View style={{ paddingHorizontal: 20, paddingVertical: 20 }}>
                 <ScrollView>
-                  {[1, 2, 3].map((ele, i) => {
-                    return (
-                      <View key={i} style={styles.purItem}>
-                        <View style={styles.purItemImageView}>
-                          <Image
-                            source={require("../assets/images/shoe1.jpg")}
-                            style={styles.purItemImage}
-                          />
-                        </View>
-                        <View style={styles.purItemDescView}>
-                          <Text style={styles.titleText}>Shoe 1</Text>
-                          <Text style={styles.priceText}>&cent;20</Text>
-                        </View>
-                        <View style={styles.btnWrapper}>
-                          <TouchableOpacity
-                            style={styles.itemBtn}
-                            onPress={() => setItemValue(itemValue + 1)}
-                          >
-                            <Feather
-                              name="chevron-up"
-                              size={24}
-                              color="black"
-                            />
-                          </TouchableOpacity>
-                          {itemValue}
-                          <TouchableOpacity
-                            style={styles.itemBtn}
-                            onPress={() => setItemValue(itemValue - 1)}
-                          >
-                            <Feather
-                              name="chevron-down"
-                              size={24}
-                              color="black"
-                            />
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                    );
-                  })}
-                  <View style={styles.details}>
-                    <Text style={styles.totals}>Total:</Text>
+                  {
+                    finList.map((ele, i) => {
+                      console.log("dd", ele[i].item.name)
+                        return (
+                          <View key={i} style={styles.purItem}>
+                            <View style={styles.purItemImageView}>
+                              <Image
+                                source={ele[i].item.url}
+                                style={styles.purItemImage}
+                              />
+                            </View>
+                            <View style={styles.purItemDescView}>
+                              <Text style={styles.titleText}>{ele[i].item.name }</Text>
+                              <Text style={styles.priceText}>&cent;{ele[i].item.price}</Text>
+                            </View>
+                            <View style={styles.btnWrapper}>
+                              <TouchableOpacity
+                                style={styles.itemBtn}
+                                onPress={() => setItemValue(itemValue + 1)}
+                              >
+                                <Feather
+                                  name="chevron-up"
+                                  size={24}
+                                  color="black"
+                                />
+                              </TouchableOpacity>
+                              {itemValue}
+                              <TouchableOpacity
+                                style={styles.itemBtn}
+                                onPress={() => setItemValue(itemValue - 1)}
+                              >
+                                <Feather
+                                  name="chevron-down"
+                                  size={24}
+                                  color="black"
+                                />
+                              </TouchableOpacity>
+                            </View>
                     <Text style={styles.totals}>&cent; 200</Text>
-                  </View>
+
+                          </View>
+                        );
+                        
+                    })
+                  }
                   <TouchableOpacity
                     onPress={handleCheckout}
                     style={styles.buttonWrapper}
                   >
-                    <Text style={styles.buttonText}>Buy Now</Text>
+                    <Text style={styles.buttonText}>Check Out</Text>
                   </TouchableOpacity>
                 </ScrollView>
               </View>
@@ -367,7 +383,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "white",
-    paddingLeft: 20
+    paddingLeft: 20,
   },
   discoverWrapper: {
     // marginHorizontal: 20,
